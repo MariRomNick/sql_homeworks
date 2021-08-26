@@ -155,26 +155,54 @@ DELETE  FROM printer_updated
 WHERE model in (
 select printer.model from  product  join printer on product.model = printer.model 
 where maker = 'D')
+
 --task9 (lesson4)
--- Êîìïüþòåðíàÿ ôèðìà: Ñäåëàòü íà áàçå òàáëèöû (printer_updated) view ñ äîïîëíèòåëüíîé êîëîíêîé ïðîèçâîäèòåëÿ (íàçâàíèå printer_updated_with_makers)
+-- Компьютерная фирма: Сделать на базе таблицы (printer_updated) view с дополнительной колонкой производителя (название printer_updated_with_makers)
+create view printer_updated_with_makers  as 
+select code, printer_updated.model,color,printer_updated.type, price, maker from printer_updated join  product on printer_updated.model = product.model
 
 --task10 (lesson4)
--- Êîðàáëè: Ñäåëàòü view c êîëè÷åñòâîì ïîòîïëåííûõ êîðàáëåé è êëàññîì êîðàáëÿ (íàçâàíèå sunk_ships_by_classes). Âî view: count, class (åñëè çíà÷åíèÿ êëàññà íåò/IS NULL, òî çàìåíèòü íà 0)
+-- Корабли: Сделать view c количеством потопленных кораблей и классом корабля (название sunk_ships_by_classes). 
+--Во view: count, class (если значения класса нет/IS NULL, то заменить на 0)
+create view sunk_ships_by_classes as
+select   count (*),
+case when class is null then '0' 
+else class
+end class1
+from (select * from outcomes o  full join ships s on o.ship=s.name where result='sunk')a
+group by class1
 
 --task11 (lesson4)
--- Êîðàáëè: Ïî ïðåäûäóùåìó view (sunk_ships_by_classes) ñäåëàòü ãðàôèê â colab (X: class, Y: count)
+-- Корабли: По предыдущему view (sunk_ships_by_classes) сделать график в colab (X: class, Y: count)
 
 --task12 (lesson4)
--- Êîðàáëè: Ñäåëàòü êîïèþ òàáëèöû classes (íàçâàíèå classes_with_flag) è äîáàâèòü â íåå flag: åñëè êîëè÷åñòâî îðóäèé áîëüøå èëè ðàâíî 9 - òî 1, èíà÷å 0
+-- Корабли: Сделать копию таблицы classes (название classes_with_flag) и добавить в нее flag: если количество орудий больше или равно 9 - то 1, иначе 0
+create table classes_with_flag as 
+select *,
+case when numGuns>=9 then 1
+else 0 end flag
+from classes
 
 --task13 (lesson4)
--- Êîðàáëè: Ñäåëàòü ãðàôèê â colab ïî òàáëèöå classes ñ êîëè÷åñòâîì êëàññîâ ïî ñòðàíàì (X: country, Y: count)
+-- Корабли: Сделать график в colab по таблице classes с количеством классов по странам (X: country, Y: count)
 
 --task14 (lesson4)
--- Êîðàáëè: Âåðíóòü êîëè÷åñòâî êîðàáëåé, ó êîòîðûõ íàçâàíèå íà÷èíàåòñÿ ñ áóêâû "O" èëè "M".
+-- Корабли: Вернуть количество кораблей, у которых название начинается с буквы "O" или "M".
+select count(*)
+from ships s full join outcomes o on s.name=o.ship 
+where (ship like 'O%' or ship like 'M%') or (name like 'O%' or name like'M%') 
 
 --task15 (lesson4)
--- Êîðàáëè: Âåðíóòü êîëè÷åñòâî êîðàáëåé, ó êîòîðûõ íàçâàíèå ñîñòîèò èç äâóõ ñëîâ.
+-- Корабли: Вернуть количество кораблей, у которых название состоит из двух слов.
+
+select count(*)
+from ships s full join outcomes o on s.name=o.ship 
+where (ship like '% %') or (name like '% %') 
+--or
+
+select count(*)
+from ships 
+where name like '% %' 
 
 --task16 (lesson4)
--- Êîðàáëè: Ïîñòðîèòü ãðàôèê ñ êîëè÷åñòâîì çàïóùåííûõ íà âîäó êîðàáëåé è ãîäîì çàïóñêà (X: year, Y: count)
+-- Корабли: Построить график с количеством запущенных на воду кораблей и годом запуска (X: year, Y: count)
